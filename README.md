@@ -4,7 +4,7 @@ An amazing Weather Forecast Web Application with PHP. It will show the current w
 #Documentation
 
 This application is using https://openweathermap.org/ API service.
-For use you have to Singup that website and collect your API key.
+For use you have to SignUp that website and collect your API key.
 
 Paste your API in index.php file on line number 05.
 
