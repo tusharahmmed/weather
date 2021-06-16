@@ -2,7 +2,7 @@
 
 if ( isset( $_POST ) && !empty( $_POST['place'] ) ) {
     $city = $_POST['place'];
-    $apiKey = '4e0a9b1693744d5c6db3982e795e7be4';
+    $apiKey = 'Your_API_KEY';
 
     // call api for latitude & longitude & current data
     $api_url_1 = 'https://api.openweathermap.org/data/2.5/weather?q=' . $city . '&appid=' . $apiKey;
