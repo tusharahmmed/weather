@@ -2,20 +2,33 @@
 
 if ( isset( $_POST ) && !empty( $_POST['place'] ) ) {
     $city = $_POST['place'];
-    $apiKey = 'your_api_key';
+    $apiKey = '4e0a9b1693744d5c6db3982e795e7be4';
 
     // call api for latitude & longitude & current data
-    $api_url_1 = 'http://api.openweathermap.org/data/2.5/weather?q=' . $city . '&appid=' . $apiKey;
+    $api_url_1 = 'https://api.openweathermap.org/data/2.5/weather?q=' . $city . '&appid=' . $apiKey;
 
-    $jsonData = file_get_contents( $api_url_1 );
-    // current weather
-    $data = json_decode( $jsonData, true );
-
-    // Get Place Coordiante for second call to get daily data
-    if ( !empty( $data ) ) {
-        $coordinate = $data['coord'];
+    // cUrl init
+    function curl_get_contents( $url ) {
+        $ch = curl_init( $url );
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+        curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1 );
+        curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0 );
+        curl_setopt( $ch, CURLOPT_SSL_VERIFYHOST, 0 );
+        $data = curl_exec( $ch );
+        curl_close( $ch );
+        return $data;
     }
 
+    $url = $api_url_1;
+    $data = json_decode( curl_get_contents( $url ), true );
+
+}
+// set code
+$code = ( !empty( $data ) ) ? $data['cod'] : '';
+
+// Get Place Coordiante for second call to get daily data
+if ( '200' == $code ) {
+    $coordinate = $data['coord'];
 }
 
 // call api for daily data
@@ -80,7 +93,19 @@ if ( isset( $coordinate ) && $coordinate ) {
 			<div class="hero" data-bg-image="https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE4wEag?ver=1497">
 				<div class="container">
 					<form action="" class="find-location" method="post">
-						<input name="place" type="text" placeholder="<?php echo ucfirst( $placeholder = ( !empty( $data ) ) ? $data['name'] : 'Find your location...' ); ?>">
+
+						<?php
+// set placeholder
+if ( '200' == $code ) {
+    $placeholder = $data['name'];
+} elseif ( '404' == $code ) {
+    $placeholder = $data['message'];
+} else {
+    $placeholder = 'Find your location...';
+}
+
+?>
+						<input name="place" type="text" placeholder="<?php echo ucfirst( $placeholder ); ?>">
 						<input type="submit" value="Find">
 					</form>
 
@@ -88,8 +113,8 @@ if ( isset( $coordinate ) && $coordinate ) {
 			</div>
 
 			<?php
-
-if ( !empty( $data ) ) {
+// if have data then code = 200
+if ( '200' == $code ) {
 
     ?>
 			<!-- Weather Table-->
@@ -186,7 +211,7 @@ if ( !empty( $data ) ) {
 						</div>
 
 						<?php
-			$i++;
+$i++;
         } // end while
         ?>
 
